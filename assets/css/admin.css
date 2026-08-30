@@ -1,0 +1,338 @@
+/**
+ * Navora Settings Page Styles
+ */
+
+.navora-settings-wrap {
+	max-width: 1100px;
+	margin: 20px auto 40px;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+	background: #f8fafc;
+	padding: 20px;
+	border-radius: 12px;
+	box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+}
+
+/* Header section */
+.navora-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+	padding: 30px;
+	border-radius: 10px;
+	color: #ffffff;
+	margin-bottom: 30px;
+}
+
+.navora-title-area h1 {
+	font-size: 32px;
+	font-weight: 700;
+	margin: 0 0 5px 0;
+	color: #ffffff;
+	line-height: 1;
+}
+
+.navora-title-area .tagline {
+	margin: 0;
+	opacity: 0.9;
+	font-size: 15px;
+	font-weight: 350;
+}
+
+.navora-author-badge {
+	background: rgba(255, 255, 255, 0.15);
+	padding: 8px 16px;
+	border-radius: 20px;
+	font-size: 13px;
+	backdrop-filter: blur(4px);
+}
+
+.navora-author-badge a {
+	color: #ffffff;
+	font-weight: 600;
+	text-decoration: none;
+}
+
+.navora-author-badge a:hover {
+	text-decoration: underline;
+}
+
+/* Main Form Grid */
+.navora-grid {
+	display: grid;
+	grid-template-columns: 1.2fr 0.8fr;
+	gap: 25px;
+	margin-bottom: 30px;
+}
+
+@media (max-width: 782px) {
+	.navora-grid {
+		grid-template-columns: 1fr;
+	}
+}
+
+.navora-card {
+	background: #ffffff;
+	border: 1px solid #e2e8f0;
+	border-radius: 10px;
+	padding: 25px;
+	box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05);
+}
+
+.navora-card h2 {
+	font-size: 18px;
+	font-weight: 600;
+	margin-top: 0;
+	margin-bottom: 20px;
+	padding-bottom: 12px;
+	border-bottom: 1px solid #f1f5f9;
+	color: #0f172a;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.navora-card h2 .dashicons {
+	color: #0d9488;
+}
+
+/* Form fields styling */
+.navora-field {
+	margin-bottom: 22px;
+}
+
+.navora-field > label {
+	display: block;
+	font-weight: 600;
+	color: #334155;
+	margin-bottom: 8px;
+	font-size: 14px;
+}
+
+.navora-field select,
+.navora-field input[type="text"],
+.navora-field input[type="number"] {
+	width: 100%;
+	max-width: 100%;
+	padding: 8px 12px;
+	border: 1px solid #cbd5e1;
+	border-radius: 6px;
+	background-color: #ffffff;
+	color: #334155;
+	font-size: 14px;
+	box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.05);
+	transition: border-color 0.15s ease-in-out;
+}
+
+.navora-field select:focus,
+.navora-field input[type="text"]:focus,
+.navora-field input[type="number"]:focus {
+	border-color: #0d9488;
+	outline: none;
+	box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
+}
+
+.navora-field .description {
+	margin-top: 6px;
+	font-size: 12px;
+	color: #64748b;
+}
+
+/* Radio Cards (Layout selection) */
+.navora-layout-options {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 15px;
+}
+
+@media (max-width: 480px) {
+	.navora-layout-options {
+		grid-template-columns: 1fr;
+	}
+}
+
+.navora-radio-card {
+	display: block;
+	position: relative;
+	border: 2px solid #e2e8f0;
+	border-radius: 8px;
+	padding: 16px;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	background: #ffffff;
+}
+
+.navora-radio-card input[type="radio"] {
+	position: absolute;
+	top: 16px;
+	right: 16px;
+	margin: 0;
+}
+
+.navora-radio-card input[type="radio"]:checked + .radio-label,
+.navora-radio-card:hover {
+	border-color: #0d9488;
+	background: rgba(13, 148, 136, 0.02);
+}
+
+.navora-radio-card input[type="radio"]:checked {
+	border-color: #0d9488;
+}
+
+.navora-radio-card input[type="radio"]:checked ~ .radio-label {
+	color: #0f172a;
+}
+
+.navora-radio-card .radio-label {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.navora-radio-card .radio-label strong {
+	font-size: 14px;
+	color: #334155;
+}
+
+.navora-radio-card .radio-label .desc {
+	font-size: 12px;
+	color: #64748b;
+	line-height: 1.4;
+}
+
+/* Checkbox specific */
+.navora-field.checkbox-field label {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-weight: 600;
+	color: #334155;
+	font-size: 14px;
+	cursor: pointer;
+}
+
+.navora-field.checkbox-field input[type="checkbox"] {
+	margin: 0;
+	width: 18px;
+	height: 18px;
+	border: 1px solid #cbd5e1;
+	border-radius: 4px;
+}
+
+.navora-field.checkbox-field input[type="checkbox"]:checked {
+	background-color: #0d9488;
+	border-color: #0d9488;
+}
+
+/* Logo Upload Area */
+.logo-upload-group {
+	display: flex;
+	gap: 10px;
+}
+
+.logo-upload-group input {
+	flex-grow: 1;
+}
+
+.logo-preview-wrapper {
+	margin-top: 15px;
+	position: relative;
+	display: inline-block;
+	background: #f1f5f9;
+	padding: 10px;
+	border-radius: 8px;
+	border: 1px dashed #cbd5e1;
+}
+
+.logo-preview-wrapper img {
+	max-height: 60px;
+	display: block;
+}
+
+.navora-remove-logo {
+	position: absolute;
+	top: -8px;
+	right: -8px;
+	background: #ef4444;
+	color: #ffffff;
+	border: none;
+	width: 20px;
+	height: 20px;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 14px;
+	line-height: 1;
+	cursor: pointer;
+	box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.navora-remove-logo:hover {
+	background: #dc2626;
+}
+
+/* Color Picker customization */
+.wp-picker-container {
+	display: block !important;
+	margin-top: 5px;
+}
+
+.wp-color-result-text {
+	border-radius: 0 4px 4px 0 !important;
+}
+
+.wp-picker-clear,
+.wp-picker-default {
+	padding: 4px 10px !important;
+	height: auto !important;
+	line-height: 1.4 !important;
+}
+
+/* Submit bar and info footer */
+.navora-submit-bar {
+	display: flex;
+	justify-content: flex-end;
+	padding: 15px 25px;
+	background: #ffffff;
+	border: 1px solid #e2e8f0;
+	border-radius: 10px;
+	box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05);
+}
+
+.navora-submit-bar input[type="submit"] {
+	background: #0d9488;
+	border-color: #0f766e;
+	box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+	font-weight: 600;
+	padding: 6px 24px;
+	font-size: 14px;
+	border-radius: 6px;
+	height: auto;
+}
+
+.navora-submit-bar input[type="submit"]:hover {
+	background: #0f766e;
+	border-color: #0d9488;
+}
+
+.navora-info-footer {
+	margin-top: 30px;
+	background: #f1f5f9;
+	border-radius: 10px;
+	padding: 20px 25px;
+	border-left: 4px solid #0d9488;
+}
+
+.navora-info-footer h3 {
+	margin-top: 0;
+	font-size: 15px;
+	color: #0f172a;
+}
+
+.navora-info-footer p {
+	margin: 0;
+	font-size: 13px;
+	color: #475569;
+	line-height: 1.6;
+}

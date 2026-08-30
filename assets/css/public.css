@@ -1,0 +1,483 @@
+/**
+ * Navora Frontend Navigation Styles (Standard 2026 Health Visual System)
+ */
+
+/* Core Container & Reset */
+.navora-header-nav {
+	font-family: var(--navora-font);
+	background-color: var(--navora-bg);
+	color: var(--navora-text);
+	width: 100%;
+	position: relative;
+	z-index: 9999;
+	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.navora-header-nav * {
+	box-sizing: border-box;
+}
+
+/* Container */
+.navora-nav-container {
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 0 20px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	height: 80px;
+}
+
+/* Sticky Header Behavior */
+.navora-header-nav.navora-sticky {
+	position: fixed;
+	top: 0;
+	left: 0;
+	box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+	animation: navora-slide-down 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes navora-slide-down {
+	from {
+		transform: translateY(-100%);
+	}
+	to {
+		transform: translateY(0);
+	}
+}
+
+/* Layout 1: Clean Clinical */
+.navora-header-nav.layout-clean-clinical {
+	border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+/* Layout 2: Modern Wellness (Floating style) */
+.navora-header-nav.layout-modern-wellness {
+	background: transparent;
+	padding: 15px 20px;
+}
+
+.navora-header-nav.layout-modern-wellness .navora-nav-container {
+	background: rgba(255, 255, 255, 0.85);
+	backdrop-filter: blur(16px);
+	-webkit-backdrop-filter: blur(16px);
+	border: 1px solid rgba(255, 255, 255, 0.6);
+	border-radius: 999px;
+	box-shadow: 0 10px 30px -10px rgba(13, 148, 136, 0.08), 0 1px 3px rgba(0, 0, 0, 0.02);
+	height: 70px;
+	transition: all 0.3s ease;
+}
+
+.navora-header-nav.layout-modern-wellness.navora-sticky {
+	background: transparent;
+	box-shadow: none;
+	padding-top: 10px;
+}
+
+.navora-header-nav.layout-modern-wellness.navora-sticky .navora-nav-container {
+	background: rgba(255, 255, 255, 0.95);
+	box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.08);
+}
+
+/* Logo */
+.navora-logo a {
+	display: flex;
+	align-items: center;
+	text-decoration: none;
+	color: var(--navora-text);
+}
+
+.navora-logo-img {
+	max-height: 45px;
+	width: auto;
+	display: block;
+	transition: transform 0.2s ease;
+}
+
+.navora-logo-img:hover {
+	transform: scale(1.02);
+}
+
+.navora-site-title {
+	font-size: 22px;
+	font-weight: 700;
+	letter-spacing: -0.5px;
+	color: var(--navora-primary);
+}
+
+/* Navigation List Base (Desktop) */
+.navora-menu-list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	align-items: center;
+	gap: 32px;
+}
+
+.navora-menu-list > .menu-item {
+	position: relative;
+	padding: 28px 0;
+}
+
+.navora-menu-list .menu-item a {
+	text-decoration: none;
+	color: var(--navora-text);
+	font-size: 15px;
+	font-weight: 550;
+	transition: color 0.2s ease;
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	position: relative;
+}
+
+.navora-menu-list > .menu-item > a::after {
+	content: '';
+	position: absolute;
+	bottom: -4px;
+	left: 0;
+	width: 0;
+	height: 2px;
+	background-color: var(--navora-primary);
+	transition: width 0.2s ease;
+}
+
+.navora-menu-list > .menu-item:hover > a,
+.navora-menu-list > .menu-item.current-menu-item > a {
+	color: var(--navora-primary);
+}
+
+.navora-menu-list > .menu-item:hover > a::after,
+.navora-menu-list > .menu-item.current-menu-item > a::after {
+	width: 100%;
+}
+
+/* Dropdown Arrow for parent menus */
+.menu-item-has-children > a::after {
+	content: '';
+	display: inline-block;
+	width: 5px;
+	height: 5px;
+	border-right: 1.5px solid currentColor;
+	border-bottom: 1.5px solid currentColor;
+	transform: translateY(-1px) rotate(45deg);
+	transition: transform 0.2s ease;
+}
+
+.menu-item-has-children:hover > a::after {
+	transform: translateY(2px) rotate(225deg);
+}
+
+/* Dropdown Menu Levels (Desktop) */
+.navora-desktop-menu .sub-menu {
+	position: absolute;
+	top: 100%;
+	left: 50%;
+	transform: translateX(-50%) translateY(10px);
+	background: #ffffff;
+	border: 1px solid rgba(15, 23, 42, 0.06);
+	border-radius: 12px;
+	box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.12);
+	min-width: 220px;
+	padding: 10px;
+	margin: 0;
+	list-style: none;
+	opacity: 0;
+	visibility: hidden;
+	transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+	z-index: 1000;
+}
+
+.navora-desktop-menu .menu-item:hover > .sub-menu,
+.navora-desktop-menu .menu-item:focus-within > .sub-menu {
+	opacity: 1;
+	visibility: visible;
+	transform: translateX(-50%) translateY(0);
+}
+
+.navora-desktop-menu .sub-menu .menu-item {
+	padding: 0;
+	margin: 0;
+}
+
+.navora-desktop-menu .sub-menu .menu-item a {
+	padding: 10px 14px;
+	font-size: 14px;
+	font-weight: 500;
+	border-radius: 8px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	color: #475569;
+}
+
+.navora-desktop-menu .sub-menu .menu-item a:hover {
+	background: rgba(13, 148, 136, 0.05);
+	color: var(--navora-primary);
+}
+
+/* Third-level Dropdowns (Desktop side slide) */
+.navora-desktop-menu .sub-menu .sub-menu {
+	top: 0;
+	left: 100%;
+	transform: translateX(10px);
+}
+
+.navora-desktop-menu .sub-menu .menu-item:hover > .sub-menu {
+	transform: translateX(0);
+}
+
+/* Call to Action Button */
+.navora-cta-btn {
+	text-decoration: none;
+	background-color: var(--navora-primary);
+	color: #ffffff !important;
+	padding: 12px 24px;
+	font-size: 14px;
+	font-weight: 600;
+	border-radius: 99px;
+	box-shadow: 0 4px 12px rgba(13, 148, 136, 0.15);
+	transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+	display: inline-block;
+	text-align: center;
+}
+
+.navora-cta-btn:hover {
+	background-color: var(--navora-active);
+	transform: translateY(-1px);
+	box-shadow: 0 6px 16px rgba(13, 148, 136, 0.25);
+}
+
+/* Burger Toggle Button */
+.navora-burger-btn {
+	background: transparent;
+	border: none;
+	display: none;
+	flex-direction: column;
+	justify-content: space-between;
+	width: 24px;
+	height: 18px;
+	cursor: pointer;
+	padding: 0;
+	z-index: 10001;
+}
+
+.burger-line {
+	width: 100%;
+	height: 2px;
+	background-color: var(--navora-text);
+	border-radius: 2px;
+	transition: all 0.2s ease;
+}
+
+/* Drawer overlay */
+.navora-drawer-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(15, 23, 42, 0.4);
+	backdrop-filter: blur(4px);
+	opacity: 0;
+	visibility: hidden;
+	transition: all 0.3s ease;
+	z-index: 10000;
+}
+
+/* Mobile Drawer Container */
+.navora-mobile-drawer {
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	width: 80%;
+	max-width: 340px;
+	height: 100vh;
+	background: #ffffff;
+	z-index: 10001;
+	display: flex;
+	flex-direction: column;
+	padding: 24px;
+	box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+	transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+}
+
+/* Behavior 1: Slide Right */
+.navora-mobile-drawer.behavior-slide-right {
+	right: 0;
+	transform: translateX(100%);
+}
+
+/* Behavior 2: Slide Left */
+.navora-mobile-drawer.behavior-slide-left {
+	left: 0;
+	transform: translateX(-100%);
+}
+
+/* Behavior 3: Fade Overlay */
+.navora-mobile-drawer.behavior-fade {
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%) scale(0.95);
+	height: auto;
+	max-height: 80vh;
+	border-radius: 16px;
+	opacity: 0;
+	visibility: hidden;
+}
+
+/* Open states */
+body.navora-drawer-open .navora-drawer-overlay {
+	opacity: 1;
+	visibility: visible;
+}
+
+body.navora-drawer-open .navora-mobile-drawer.behavior-slide-right,
+body.navora-drawer-open .navora-mobile-drawer.behavior-slide-left {
+	transform: translateX(0);
+}
+
+body.navora-drawer-open .navora-mobile-drawer.behavior-fade {
+	opacity: 1;
+	visibility: visible;
+	transform: translate(-50%, -50%) scale(1);
+}
+
+/* Drawer Header */
+.navora-drawer-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 30px;
+	padding-bottom: 15px;
+	border-bottom: 1px solid #f1f5f9;
+}
+
+.navora-drawer-logo a {
+	text-decoration: none;
+}
+
+.navora-close-btn {
+	background: transparent;
+	border: none;
+	font-size: 28px;
+	color: #64748b;
+	cursor: pointer;
+	padding: 0;
+	line-height: 1;
+}
+
+.navora-close-btn:hover {
+	color: #0f172a;
+}
+
+/* Mobile Menu Navigation List */
+.navora-mobile-menu {
+	flex-grow: 1;
+	overflow-y: auto;
+	margin-bottom: 20px;
+}
+
+.navora-mobile-menu .navora-menu-list {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 0;
+	width: 100%;
+}
+
+.navora-mobile-menu .menu-item {
+	width: 100%;
+	padding: 0;
+	position: relative;
+	border-bottom: 1px solid #f8fafc;
+}
+
+.navora-mobile-menu .menu-item a {
+	padding: 14px 0;
+	font-size: 16px;
+	color: #334155;
+	display: flex;
+	justify-content: space-between;
+	width: 100%;
+}
+
+.navora-mobile-menu .menu-item a::after {
+	display: none !important;
+}
+
+/* Mobile Dropdown Submenus */
+.navora-mobile-menu .sub-menu {
+	list-style: none;
+	padding-left: 15px;
+	margin: 0;
+	display: none;
+	background: #f8fafc;
+	border-radius: 8px;
+	width: 100%;
+}
+
+.navora-mobile-menu .sub-menu .menu-item {
+	border-bottom: none;
+}
+
+.navora-mobile-menu .sub-menu .menu-item a {
+	font-size: 14px;
+	padding: 10px 0;
+	color: #64748b;
+}
+
+/* Mobile sub-menu toggle arrows */
+.navora-submenu-toggle {
+	position: absolute;
+	right: 0;
+	top: 0;
+	width: 48px;
+	height: 48px;
+	background: transparent;
+	border: none;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: #94a3b8;
+}
+
+.navora-submenu-toggle::after {
+	content: '';
+	display: inline-block;
+	width: 6px;
+	height: 6px;
+	border-right: 2px solid currentColor;
+	border-bottom: 2px solid currentColor;
+	transform: rotate(45deg);
+	transition: transform 0.2s ease;
+}
+
+.navora-submenu-toggle.toggled::after {
+	transform: rotate(-135deg);
+	color: var(--navora-primary);
+}
+
+/* Drawer Footer */
+.navora-drawer-footer {
+	padding-top: 15px;
+	border-top: 1px solid #f1f5f9;
+}
+
+.navora-cta-drawer {
+	width: 100%;
+}
+
+/* Fallback Menu styling */
+.fallback-menu {
+	margin: 0 auto;
+}
+
+.fallback-menu .menu-item a {
+	border: 1px dashed var(--navora-primary);
+	padding: 10px 20px;
+	border-radius: 6px;
+	font-size: 14px;
+}
