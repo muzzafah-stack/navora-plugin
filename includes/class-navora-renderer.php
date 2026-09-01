@@ -93,6 +93,9 @@ class Navora_Renderer {
 				--navora-bg: <?php echo esc_html( $options['bg_color'] ); ?>;
 				--navora-font: <?php echo $font_stack; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>;
 				--navora-breakpoint-val: <?php echo esc_html( $breakpoint ); ?>px;
+				--navora-topbar-bg: <?php echo esc_html( $options['topbar_bg'] ); ?>;
+				--navora-topbar-text: <?php echo esc_html( $options['topbar_text_color'] ); ?>;
+				--navora-topbar-link: <?php echo esc_html( $options['topbar_link_color'] ); ?>;
 			}
 
 			/* CSS variables cannot be used in media query declarations, so we render the breakpoint dynamically */
@@ -114,8 +117,87 @@ class Navora_Renderer {
 				.navora-header-nav .navora-cta-container .navora-cta-btn {
 					display: none !important;
 				}
+				.navora-topbar.hide-on-mobile {
+					display: none !important;
+				}
 			}
 		</style>
+		<?php
+	}
+
+	/**
+	 * Render Auxiliary / Secondary Bar (Top / Bottom Bar).
+	 */
+	public function render_topbar( $options ) {
+		if ( '1' !== $options['enable_topbar'] ) {
+			return;
+		}
+
+		$hide_mobile_class = ( '1' === $options['topbar_hide_mobile'] ) ? 'hide-on-mobile' : '';
+		$position_class    = 'pos-' . esc_attr( $options['topbar_position'] );
+		?>
+		<div class="navora-topbar <?php echo esc_attr( $position_class ); ?> <?php echo esc_attr( $hide_mobile_class ); ?>">
+			<div class="navora-topbar-inner">
+				
+				<!-- Left Content -->
+				<div class="navora-topbar-left">
+					<?php if ( ! empty( $options['topbar_left_menu_id'] ) ) : ?>
+						<?php
+						wp_nav_menu(
+							array(
+								'menu'        => $options['topbar_left_menu_id'],
+								'container'   => false,
+								'menu_class'  => 'navora-topbar-menu',
+								'depth'       => 1,
+								'fallback_cb' => false,
+							)
+						);
+						?>
+					<?php else : ?>
+						<?php if ( ! empty( $options['topbar_left_badge'] ) ) : ?>
+							<span class="navora-topbar-badge">
+								<span class="badge-dot"></span>
+								<?php echo esc_html( $options['topbar_left_badge'] ); ?>
+							</span>
+						<?php endif; ?>
+
+						<?php if ( ! empty( $options['topbar_left_text'] ) ) : ?>
+							<?php if ( ! empty( $options['topbar_left_url'] ) ) : ?>
+								<a href="<?php echo esc_url( $options['topbar_left_url'] ); ?>" class="navora-topbar-link">
+									<?php echo wp_kses_post( $options['topbar_left_text'] ); ?>
+								</a>
+							<?php else : ?>
+								<span class="navora-topbar-text">
+									<?php echo wp_kses_post( $options['topbar_left_text'] ); ?>
+								</span>
+							<?php endif; ?>
+						<?php endif; ?>
+					<?php endif; ?>
+				</div>
+
+				<!-- Right Content -->
+				<div class="navora-topbar-right">
+					<?php if ( ! empty( $options['topbar_right_menu_id'] ) ) : ?>
+						<?php
+						wp_nav_menu(
+							array(
+								'menu'        => $options['topbar_right_menu_id'],
+								'container'   => false,
+								'menu_class'  => 'navora-topbar-menu',
+								'depth'       => 1,
+								'fallback_cb' => false,
+							)
+						);
+						?>
+					<?php elseif ( ! empty( $options['topbar_right_text'] ) ) : ?>
+						<a href="<?php echo esc_url( ! empty( $options['topbar_right_url'] ) ? $options['topbar_right_url'] : '#' ); ?>" class="navora-topbar-action-link">
+							<span><?php echo esc_html( $options['topbar_right_text'] ); ?></span>
+						</a>
+					<?php endif; ?>
+				</div>
+
+			</div>
+		</div>
 		<?php
 	}
 
@@ -160,6 +242,14 @@ class Navora_Renderer {
 
 		?>
 		<header class="navora-header-nav layout-<?php echo esc_attr( $options['layout'] ); ?> <?php echo esc_attr( $sticky_class ); ?>">
+			
+			<!-- Topbar rendered Above if position is 'above' -->
+			<?php
+			if ( 'above' === $options['topbar_position'] ) {
+				$this->render_topbar( $options );
+			}
+			?>
+
 			<div class="navora-nav-container">
 				
 				<!-- Logo -->
@@ -191,6 +281,13 @@ class Navora_Renderer {
 
 			</div>
 
+			<!-- Topbar rendered Below if position is 'below' -->
+			<?php
+			if ( 'below' === $options['topbar_position'] ) {
+				$this->render_topbar( $options );
+			}
+			?>
+
 			<!-- Mobile Drawer -->
 			<div id="navora-mobile-drawer" class="navora-mobile-drawer behavior-<?php echo esc_attr( $options['mobile_behavior'] ); ?>">
 				<div class="navora-drawer-header">
@@ -202,11 +299,31 @@ class Navora_Renderer {
 					<button class="navora-close-btn" aria-label="<?php esc_attr_e( 'Close Menu', 'navora' ); ?>">&times;</button>
 				</div>
 
+				<!-- Mobile Auxiliary info banner (if enabled) -->
+				<?php if ( '1' === $options['enable_topbar'] && ! empty( $options['topbar_left_text'] ) ) : ?>
+					<div class="navora-drawer-topbar-info">
+						<?php if ( ! empty( $options['topbar_left_badge'] ) ) : ?>
+							<span class="navora-topbar-badge"><?php echo esc_html( $options['topbar_left_badge'] ); ?></span>
+						<?php endif; ?>
+						<?php if ( ! empty( $options['topbar_left_url'] ) ) : ?>
+							<a href="<?php echo esc_url( $options['topbar_left_url'] ); ?>"><?php echo wp_kses_post( $options['topbar_left_text'] ); ?></a>
+						<?php else : ?>
+							<span><?php echo wp_kses_post( $options['topbar_left_text'] ); ?></span>
+						<?php endif; ?>
+					</div>
+				<?php endif; ?>
+
 				<nav class="navora-mobile-menu" aria-label="<?php esc_attr_e( 'Mobile Navigation', 'navora' ); ?>">
 					<?php wp_nav_menu( $menu_args ); ?>
 				</nav>
 
 				<div class="navora-drawer-footer">
+					<?php if ( '1' === $options['enable_topbar'] && ! empty( $options['topbar_right_text'] ) ) : ?>
+						<a href="<?php echo esc_url( ! empty( $options['topbar_right_url'] ) ? $options['topbar_right_url'] : '#' ); ?>" class="navora-topbar-action-drawer">
+							<?php echo esc_html( $options['topbar_right_text'] ); ?>
+						</a>
+					<?php endif; ?>
+
 					<?php if ( ! empty( $options['cta_text'] ) ) : ?>
 						<a href="<?php echo esc_url( $options['cta_url'] ); ?>" class="navora-cta-btn navora-cta-drawer">
 							<?php echo esc_html( $options['cta_text'] ); ?>
@@ -236,3 +353,4 @@ class Navora_Renderer {
 function navora_render_menu() {
 	Navora_Renderer::get_instance()->render();
 }
+

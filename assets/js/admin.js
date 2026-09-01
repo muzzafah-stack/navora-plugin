@@ -41,4 +41,14 @@ jQuery(document).ready(function($) {
 		$('#navora-logo-preview').hide();
 		$('#navora-logo-preview img').attr('src', '');
 	});
+
+	// Toggle Secondary Bar Settings Visibility
+	$('#navora_enable_topbar').on('change', function() {
+		if ($(this).is(':checked')) {
+			$('.navora-topbar-controls').slideDown(200);
+		} else {
+			$('.navora-topbar-controls').slideUp(200);
+		}
+	});
 });
+

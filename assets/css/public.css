@@ -481,3 +481,192 @@ body.navora-drawer-open .navora-mobile-drawer.behavior-fade {
 	border-radius: 6px;
 	font-size: 14px;
 }
+
+/* ==========================================================================
+   Auxiliary / Secondary Bar Styles (Top Bar & Bottom Bar - 2026 Standard)
+   ========================================================================== */
+.navora-topbar {
+	background-color: var(--navora-topbar-bg, #f0fdfa);
+	color: var(--navora-topbar-text, #334155);
+	font-size: 13px;
+	font-weight: 500;
+	width: 100%;
+	line-height: 1.5;
+	transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.navora-topbar.pos-above {
+	border-bottom: 1px solid rgba(15, 23, 42, 0.05);
+}
+
+.navora-topbar.pos-below {
+	border-top: 1px solid rgba(15, 23, 42, 0.05);
+}
+
+.navora-topbar-inner {
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 7px 20px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	min-height: 38px;
+}
+
+.navora-topbar-left,
+.navora-topbar-right {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+/* Badge with 2026 Live Pulse Dot */
+.navora-topbar-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	background: rgba(13, 148, 136, 0.12);
+	color: var(--navora-primary);
+	font-size: 10.5px;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	padding: 2px 8px;
+	border-radius: 999px;
+	line-height: 1.4;
+}
+
+.navora-topbar-badge .badge-dot {
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background-color: var(--navora-primary);
+	box-shadow: 0 0 0 0 rgba(13, 148, 136, 0.7);
+	animation: navora-pulse 1.8s infinite cubic-bezier(0.66, 0, 0, 1);
+	display: inline-block;
+}
+
+@keyframes navora-pulse {
+	0% {
+		box-shadow: 0 0 0 0 rgba(13, 148, 136, 0.7);
+	}
+	70% {
+		box-shadow: 0 0 0 5px rgba(13, 148, 136, 0);
+	}
+	100% {
+		box-shadow: 0 0 0 0 rgba(13, 148, 136, 0);
+	}
+}
+
+/* Left text and links */
+.navora-topbar-text,
+.navora-topbar-link {
+	color: var(--navora-topbar-text, #334155);
+	text-decoration: none;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	transition: color 0.2s ease;
+}
+
+.navora-topbar-link:hover {
+	color: var(--navora-topbar-link, var(--navora-primary));
+}
+
+/* Secondary Topbar Menus */
+.navora-topbar-menu {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	align-items: center;
+	gap: 16px;
+}
+
+.navora-topbar-menu li {
+	margin: 0;
+	padding: 0;
+}
+
+.navora-topbar-menu a {
+	text-decoration: none;
+	color: var(--navora-topbar-text, #334155);
+	font-size: 13px;
+	font-weight: 500;
+	transition: color 0.2s ease;
+}
+
+.navora-topbar-menu a:hover {
+	color: var(--navora-topbar-link, var(--navora-primary));
+}
+
+/* Right Action CTA link */
+.navora-topbar-action-link {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	font-weight: 600;
+	font-size: 13px;
+	color: var(--navora-topbar-link, var(--navora-primary));
+	text-decoration: none;
+	padding: 4px 12px;
+	border-radius: 99px;
+	background: rgba(13, 148, 136, 0.08);
+	transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.navora-topbar-action-link:hover {
+	background: rgba(13, 148, 136, 0.18);
+	transform: translateX(3px);
+}
+
+/* Mobile Drawer Topbar Elements */
+.navora-drawer-topbar-info {
+	background: var(--navora-topbar-bg, #f0fdfa);
+	border: 1px solid rgba(13, 148, 136, 0.12);
+	border-radius: 8px;
+	padding: 10px 14px;
+	margin-bottom: 16px;
+	font-size: 13px;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	color: var(--navora-topbar-text, #334155);
+}
+
+.navora-drawer-topbar-info a {
+	text-decoration: none;
+	color: inherit;
+	font-weight: 500;
+}
+
+.navora-topbar-action-drawer {
+	display: block;
+	width: 100%;
+	text-align: center;
+	font-size: 14px;
+	font-weight: 600;
+	color: var(--navora-topbar-link, var(--navora-primary));
+	text-decoration: none;
+	padding: 10px 16px;
+	margin-bottom: 10px;
+	background: rgba(13, 148, 136, 0.08);
+	border-radius: 8px;
+	transition: background 0.2s;
+}
+
+.navora-topbar-action-drawer:hover {
+	background: rgba(13, 148, 136, 0.16);
+}
+
+/* Modern Wellness layout integration */
+.navora-header-nav.layout-modern-wellness .navora-topbar {
+	background: transparent;
+	border: none;
+	padding: 4px 20px 0;
+}
+
+.navora-header-nav.layout-modern-wellness .navora-topbar-inner {
+	padding: 0 10px;
+}
+

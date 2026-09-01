@@ -69,19 +69,34 @@ class Navora_Settings {
 	 */
 	public function get_default_options() {
 		return array(
-			'menu_id'         => '',
-			'layout'          => 'clean-clinical',
-			'logo_url'        => '',
-			'primary_color'   => '#0d9488', // Teal
-			'text_color'      => '#1f2937', // Dark Slate
-			'active_color'    => '#0f766e', // Hover Teal
-			'bg_color'        => '#ffffff', // Background White
-			'font_family'     => 'Outfit',  // Standard 2026 Modern Health Font
-			'breakpoint'      => '768',
-			'sticky'          => '1',
-			'cta_text'        => 'Book Appointment',
-			'cta_url'         => '#',
-			'mobile_behavior' => 'slide-right',
+			'menu_id'              => '',
+			'layout'               => 'clean-clinical',
+			'logo_url'             => '',
+			'primary_color'        => '#0d9488', // Teal
+			'text_color'           => '#1f2937', // Dark Slate
+			'active_color'         => '#0f766e', // Hover Teal
+			'bg_color'             => '#ffffff', // Background White
+			'font_family'          => 'Outfit',  // Standard 2026 Modern Health Font
+			'breakpoint'           => '768',
+			'sticky'               => '1',
+			'cta_text'             => 'Book Appointment',
+			'cta_url'              => '#',
+			'mobile_behavior'      => 'slide-right',
+
+			// Secondary / Auxiliary Bar (Top/Bottom Bar) Options
+			'enable_topbar'        => '0',
+			'topbar_position'      => 'above', // 'above' or 'below'
+			'topbar_bg'            => '#f0fdfa',
+			'topbar_text_color'    => '#334155',
+			'topbar_link_color'    => '#0d9488',
+			'topbar_left_badge'    => '',
+			'topbar_left_text'     => '📞 Info Pelatihan',
+			'topbar_left_url'      => '',
+			'topbar_left_menu_id'  => '',
+			'topbar_right_text'    => 'Join with Us ›››',
+			'topbar_right_url'     => '#',
+			'topbar_right_menu_id' => '',
+			'topbar_hide_mobile'   => '0',
 		);
 	}
 
@@ -113,6 +128,21 @@ class Navora_Settings {
 		$output['cta_text']        = isset( $input['cta_text'] ) ? sanitize_text_field( $input['cta_text'] ) : '';
 		$output['cta_url']         = isset( $input['cta_url'] ) ? esc_url_raw( $input['cta_url'] ) : '';
 		$output['mobile_behavior'] = isset( $input['mobile_behavior'] ) && in_array( $input['mobile_behavior'], array( 'slide-right', 'slide-left', 'fade' ), true ) ? $input['mobile_behavior'] : 'slide-right';
+
+		// Topbar Sanitization
+		$output['enable_topbar']        = isset( $input['enable_topbar'] ) ? '1' : '0';
+		$output['topbar_position']      = isset( $input['topbar_position'] ) && in_array( $input['topbar_position'], array( 'above', 'below' ), true ) ? $input['topbar_position'] : 'above';
+		$output['topbar_bg']            = isset( $input['topbar_bg'] ) ? sanitize_hex_color( $input['topbar_bg'] ) : '#f0fdfa';
+		$output['topbar_text_color']    = isset( $input['topbar_text_color'] ) ? sanitize_hex_color( $input['topbar_text_color'] ) : '#334155';
+		$output['topbar_link_color']    = isset( $input['topbar_link_color'] ) ? sanitize_hex_color( $input['topbar_link_color'] ) : '#0d9488';
+		$output['topbar_left_badge']    = isset( $input['topbar_left_badge'] ) ? sanitize_text_field( $input['topbar_left_badge'] ) : '';
+		$output['topbar_left_text']     = isset( $input['topbar_left_text'] ) ? wp_kses_post( $input['topbar_left_text'] ) : '';
+		$output['topbar_left_url']      = isset( $input['topbar_left_url'] ) ? esc_url_raw( $input['topbar_left_url'] ) : '';
+		$output['topbar_left_menu_id']  = isset( $input['topbar_left_menu_id'] ) ? sanitize_text_field( $input['topbar_left_menu_id'] ) : '';
+		$output['topbar_right_text']    = isset( $input['topbar_right_text'] ) ? sanitize_text_field( $input['topbar_right_text'] ) : '';
+		$output['topbar_right_url']     = isset( $input['topbar_right_url'] ) ? esc_url_raw( $input['topbar_right_url'] ) : '';
+		$output['topbar_right_menu_id'] = isset( $input['topbar_right_menu_id'] ) ? sanitize_text_field( $input['topbar_right_menu_id'] ) : '';
+		$output['topbar_hide_mobile']   = isset( $input['topbar_hide_mobile'] ) ? '1' : '0';
 
 		return $output;
 	}
@@ -169,7 +199,7 @@ class Navora_Settings {
 
 						<!-- Navigation Menu Selection -->
 						<div class="navora-field">
-							<label for="navora_menu_id"><?php esc_html_e( 'Select Menu Source', 'navora' ); ?></label>
+							<label for="navora_menu_id"><?php esc_html_e( 'Select Main Menu Source', 'navora' ); ?></label>
 							<select id="navora_menu_id" name="navora_options[menu_id]">
 								<option value=""><?php esc_html_e( '-- Choose a WordPress Menu --', 'navora' ); ?></option>
 								<?php foreach ( $menus as $menu ) : ?>
@@ -295,6 +325,118 @@ class Navora_Settings {
 					</div>
 				</div>
 
+				<!-- Auxiliary / Secondary Bar Panel (Top Bar / Bottom Bar) -->
+				<div class="navora-card secondary-bar-settings" style="margin-bottom: 25px;">
+					<h2><span class="dashicons dashicons-menu-alt2"></span> <?php esc_html_e( 'Auxiliary / Secondary Menu Bar (Top Bar / Sub Bar)', 'navora' ); ?></h2>
+					<p class="description" style="margin-bottom: 20px;">
+						<?php esc_html_e( 'Add an extra information/navigation bar above or below your main header for announcements, contact info, training details, badges, or secondary links.', 'navora' ); ?>
+					</p>
+
+					<div class="navora-field checkbox-field" style="background: #f8fafc; padding: 12px 16px; border-radius: 8px; border: 1px solid #e2e8f0;">
+						<label for="navora_enable_topbar">
+							<input type="checkbox" id="navora_enable_topbar" name="navora_options[enable_topbar]" value="1" <?php checked( $options['enable_topbar'], '1' ); ?>>
+							<span><strong><?php esc_html_e( 'Enable Auxiliary / Secondary Bar', 'navora' ); ?></strong></span>
+						</label>
+					</div>
+
+					<div class="navora-topbar-controls" style="<?php echo ( '1' !== $options['enable_topbar'] ) ? 'display:none;' : ''; ?>">
+						<div class="navora-grid" style="margin-top: 20px; margin-bottom: 0;">
+							<!-- Position & Appearance -->
+							<div class="navora-subcard" style="background:#fff; padding:15px; border:1px solid #e2e8f0; border-radius:8px;">
+								<h3 style="margin-top:0; font-size:14px; color:#0f172a;"><?php esc_html_e( 'Bar Position & Colors', 'navora' ); ?></h3>
+
+								<div class="navora-field">
+									<label for="navora_topbar_position"><?php esc_html_e( 'Bar Position', 'navora' ); ?></label>
+									<select id="navora_topbar_position" name="navora_options[topbar_position]">
+										<option value="above" <?php selected( $options['topbar_position'], 'above' ); ?>><?php esc_html_e( 'Top (Above Main Header)', 'navora' ); ?></option>
+										<option value="below" <?php selected( $options['topbar_position'], 'below' ); ?>><?php esc_html_e( 'Bottom (Below Main Header / Sub-Bar)', 'navora' ); ?></option>
+									</select>
+								</div>
+
+								<div class="navora-field">
+									<label for="navora_topbar_bg"><?php esc_html_e( 'Bar Background Color', 'navora' ); ?></label>
+									<input type="text" id="navora_topbar_bg" name="navora_options[topbar_bg]" value="<?php echo esc_attr( $options['topbar_bg'] ); ?>" class="navora-color-picker">
+								</div>
+
+								<div class="navora-field">
+									<label for="navora_topbar_text_color"><?php esc_html_e( 'Text Color', 'navora' ); ?></label>
+									<input type="text" id="navora_topbar_text_color" name="navora_options[topbar_text_color]" value="<?php echo esc_attr( $options['topbar_text_color'] ); ?>" class="navora-color-picker">
+								</div>
+
+								<div class="navora-field">
+									<label for="navora_topbar_link_color"><?php esc_html_e( 'Link / Accent Color', 'navora' ); ?></label>
+									<input type="text" id="navora_topbar_link_color" name="navora_options[topbar_link_color]" value="<?php echo esc_attr( $options['topbar_link_color'] ); ?>" class="navora-color-picker">
+								</div>
+
+								<div class="navora-field checkbox-field">
+									<label for="navora_topbar_hide_mobile">
+										<input type="checkbox" id="navora_topbar_hide_mobile" name="navora_options[topbar_hide_mobile]" value="1" <?php checked( $options['topbar_hide_mobile'], '1' ); ?>>
+										<span><?php esc_html_e( 'Hide bar on mobile screens', 'navora' ); ?></span>
+									</label>
+								</div>
+							</div>
+
+							<!-- Left & Right Content -->
+							<div class="navora-subcard" style="background:#fff; padding:15px; border:1px solid #e2e8f0; border-radius:8px;">
+								<h3 style="margin-top:0; font-size:14px; color:#0f172a;"><?php esc_html_e( 'Left Content (Info / Text / Badge / Menu)', 'navora' ); ?></h3>
+
+								<div class="navora-field">
+									<label for="navora_topbar_left_badge"><?php esc_html_e( 'Optional Pill Badge', 'navora' ); ?></label>
+									<input type="text" id="navora_topbar_left_badge" name="navora_options[topbar_left_badge]" value="<?php echo esc_attr( $options['topbar_left_badge'] ); ?>" placeholder="e.g. INFO or NEW">
+								</div>
+
+								<div class="navora-field">
+									<label for="navora_topbar_left_text"><?php esc_html_e( 'Left Text / Title (Supports Emoji/Icon)', 'navora' ); ?></label>
+									<input type="text" id="navora_topbar_left_text" name="navora_options[topbar_left_text]" value="<?php echo esc_attr( $options['topbar_left_text'] ); ?>" placeholder="e.g. 📞 Info Pelatihan: +62 812-3456-7890">
+								</div>
+
+								<div class="navora-field">
+									<label for="navora_topbar_left_url"><?php esc_html_e( 'Left Link URL (Optional)', 'navora' ); ?></label>
+									<input type="text" id="navora_topbar_left_url" name="navora_options[topbar_left_url]" value="<?php echo esc_attr( $options['topbar_left_url'] ); ?>" placeholder="e.g. /training-info">
+								</div>
+
+								<div class="navora-field">
+									<label for="navora_topbar_left_menu_id"><?php esc_html_e( 'Or Display Secondary Menu (Left)', 'navora' ); ?></label>
+									<select id="navora_topbar_left_menu_id" name="navora_options[topbar_left_menu_id]">
+										<option value=""><?php esc_html_e( '-- None (Use Text / Badge above) --', 'navora' ); ?></option>
+										<?php foreach ( $menus as $menu ) : ?>
+											<option value="<?php echo esc_attr( $menu->term_id ); ?>" <?php selected( $options['topbar_left_menu_id'], $menu->term_id ); ?>>
+												<?php echo esc_html( $menu->name ); ?>
+											</option>
+										<?php endforeach; ?>
+									</select>
+								</div>
+
+								<hr style="margin:18px 0; border:0; border-top:1px solid #f1f5f9;">
+
+								<h3 style="font-size:14px; color:#0f172a;"><?php esc_html_e( 'Right Content (Action Link / CTA / Menu)', 'navora' ); ?></h3>
+
+								<div class="navora-field">
+									<label for="navora_topbar_right_text"><?php esc_html_e( 'Right Action Text', 'navora' ); ?></label>
+									<input type="text" id="navora_topbar_right_text" name="navora_options[topbar_right_text]" value="<?php echo esc_attr( $options['topbar_right_text'] ); ?>" placeholder="e.g. Join with Us ›››">
+								</div>
+
+								<div class="navora-field">
+									<label for="navora_topbar_right_url"><?php esc_html_e( 'Right Link URL', 'navora' ); ?></label>
+									<input type="text" id="navora_topbar_right_url" name="navora_options[topbar_right_url]" value="<?php echo esc_attr( $options['topbar_right_url'] ); ?>" placeholder="e.g. /join">
+								</div>
+
+								<div class="navora-field">
+									<label for="navora_topbar_right_menu_id"><?php esc_html_e( 'Or Display Secondary Menu (Right)', 'navora' ); ?></label>
+									<select id="navora_topbar_right_menu_id" name="navora_options[topbar_right_menu_id]">
+										<option value=""><?php esc_html_e( '-- None (Use Action Text above) --', 'navora' ); ?></option>
+										<?php foreach ( $menus as $menu ) : ?>
+											<option value="<?php echo esc_attr( $menu->term_id ); ?>" <?php selected( $options['topbar_right_menu_id'], $menu->term_id ); ?>>
+												<?php echo esc_html( $menu->name ); ?>
+											</option>
+										<?php endforeach; ?>
+									</select>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
 				<div class="navora-submit-bar">
 					<?php submit_button( __( 'Save Settings', 'navora' ), 'primary', 'submit', false ); ?>
 				</div>
@@ -312,3 +454,4 @@ class Navora_Settings {
 		<?php
 	}
 }
+
