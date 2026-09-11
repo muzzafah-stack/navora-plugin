@@ -35,8 +35,21 @@ class Navora_Renderer {
 		// Enqueue scripts/styles.
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_public_assets' ) );
 
-		// Output dynamic inline styles.
-		add_action( 'wp_head', array( $this, 'output_dynamic_styles' ) );
+		// Preconnect resource hints for Google Fonts.
+		add_filter( 'wp_resource_hints', array( $this, 'add_resource_hints' ), 10, 2 );
+	}
+
+	/**
+	 * Add preconnect resource hints for Google Fonts CDN.
+	 */
+	public function add_resource_hints( $urls, $relation_type ) {
+		if ( wp_style_is( 'navora-google-fonts', 'queue' ) && 'preconnect' === $relation_type ) {
+			$urls[] = array(
+				'href'        => 'https://fonts.gstatic.com',
+				'crossorigin' => 'anonymous',
+			);
+		}
+		return $urls;
 	}
 
 	/**
@@ -61,15 +74,25 @@ class Navora_Renderer {
 
 		// CSS.
 		wp_enqueue_style( 'navora-public-style', NAVORA_URL . 'assets/css/public.css', array(), NAVORA_VERSION );
+		wp_add_inline_style( 'navora-public-style', $this->get_dynamic_css() );
 
-		// JS.
-		wp_enqueue_script( 'navora-public-script', NAVORA_URL . 'assets/js/public.js', array(), NAVORA_VERSION, true );
+		// JS (Loaded in footer with defer for 0 render blocking).
+		wp_enqueue_script(
+			'navora-public-script',
+			NAVORA_URL . 'assets/js/public.js',
+			array(),
+			NAVORA_VERSION,
+			array(
+				'in_footer' => true,
+				'strategy'  => 'defer',
+			)
+		);
 	}
 
 	/**
-	 * Output inline CSS Custom Properties (caching-safe design).
+	 * Generate inline CSS custom properties and dynamic breakpoint queries.
 	 */
-	public function output_dynamic_styles() {
+	public function get_dynamic_css() {
 		$options    = Navora_Settings::get_options();
 		$breakpoint = (int) $options['breakpoint'];
 
@@ -84,45 +107,45 @@ class Navora_Renderer {
 		} elseif ( 'sans-serif' === $options['font_family'] ) {
 			$font_stack = 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 		}
-		?>
-		<style id="navora-custom-vars">
-			:root {
-				--navora-primary: <?php echo esc_html( $options['primary_color'] ); ?>;
-				--navora-text: <?php echo esc_html( $options['text_color'] ); ?>;
-				--navora-active: <?php echo esc_html( $options['active_color'] ); ?>;
-				--navora-bg: <?php echo esc_html( $options['bg_color'] ); ?>;
-				--navora-font: <?php echo $font_stack; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>;
-				--navora-breakpoint-val: <?php echo esc_html( $breakpoint ); ?>px;
-				--navora-topbar-bg: <?php echo esc_html( $options['topbar_bg'] ); ?>;
-				--navora-topbar-text: <?php echo esc_html( $options['topbar_text_color'] ); ?>;
-				--navora-topbar-link: <?php echo esc_html( $options['topbar_link_color'] ); ?>;
-			}
 
-			/* CSS variables cannot be used in media query declarations, so we render the breakpoint dynamically */
-			@media (min-width: <?php echo esc_html( $breakpoint + 1 ); ?>px) {
-				.navora-desktop-menu {
-					display: flex !important;
-				}
-				.navora-burger-btn {
-					display: none !important;
-				}
-			}
-			@media (max-width: <?php echo esc_html( $breakpoint ); ?>px) {
-				.navora-desktop-menu {
-					display: none !important;
-				}
-				.navora-burger-btn {
-					display: flex !important;
-				}
-				.navora-header-nav .navora-cta-container .navora-cta-btn {
-					display: none !important;
-				}
-				.navora-topbar.hide-on-mobile {
-					display: none !important;
-				}
-			}
-		</style>
-		<?php
+		$primary_color = esc_attr( $options['primary_color'] );
+		$text_color    = esc_attr( $options['text_color'] );
+		$active_color  = esc_attr( $options['active_color'] );
+		$bg_color      = esc_attr( $options['bg_color'] );
+		$topbar_bg     = esc_attr( $options['topbar_bg'] );
+		$topbar_text   = esc_attr( $options['topbar_text_color'] );
+		$topbar_link   = esc_attr( $options['topbar_link_color'] );
+		$bp_max        = $breakpoint;
+		$bp_min        = $breakpoint + 1;
+
+		return ":root {
+			--navora-primary: {$primary_color};
+			--navora-text: {$text_color};
+			--navora-active: {$active_color};
+			--navora-bg: {$bg_color};
+			--navora-font: {$font_stack};
+			--navora-breakpoint-val: {$breakpoint}px;
+			--navora-topbar-bg: {$topbar_bg};
+			--navora-topbar-text: {$topbar_text};
+			--navora-topbar-link: {$topbar_link};
+		}
+		@media (min-width: {$bp_min}px) {
+			.navora-desktop-menu { display: flex !important; }
+			.navora-burger-btn { display: none !important; }
+		}
+		@media (max-width: {$bp_max}px) {
+			.navora-desktop-menu { display: none !important; }
+			.navora-burger-btn { display: flex !important; }
+			.navora-header-nav .navora-cta-container .navora-cta-btn { display: none !important; }
+			.navora-topbar.hide-on-mobile { display: none !important; }
+		}";
+	}
+
+	/**
+	 * Output inline CSS Custom Properties (fallback in head).
+	 */
+	public function output_dynamic_styles() {
+		echo '<style id="navora-custom-vars">' . $this->get_dynamic_css() . '</style>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
 	/**
@@ -219,7 +242,7 @@ class Navora_Renderer {
 		// Logo source.
 		$logo_html = '';
 		if ( ! empty( $options['logo_url'] ) ) {
-			$logo_html = '<img src="' . esc_url( $options['logo_url'] ) . '" alt="' . esc_attr( get_bloginfo( 'name' ) ) . '" class="navora-logo-img">';
+			$logo_html = '<img src="' . esc_url( $options['logo_url'] ) . '" alt="' . esc_attr( get_bloginfo( 'name' ) ) . '" class="navora-logo-img" decoding="async" loading="eager">';
 		} else {
 			$logo_html = '<span class="navora-site-title">' . esc_html( get_bloginfo( 'name' ) ) . '</span>';
 		}

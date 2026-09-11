@@ -26,6 +26,8 @@
 	align-items: center;
 	justify-content: space-between;
 	height: 80px;
+	gap: 16px;
+	width: 100%;
 }
 
 /* Sticky Header Behavior */
@@ -80,16 +82,28 @@
 }
 
 /* Logo */
+.navora-logo {
+	display: flex;
+	align-items: center;
+	min-width: 0;
+	flex: 0 1 auto;
+	max-width: calc(100% - 50px);
+}
+
 .navora-logo a {
 	display: flex;
 	align-items: center;
 	text-decoration: none;
 	color: var(--navora-text);
+	max-width: 100%;
 }
 
 .navora-logo-img {
 	max-height: 45px;
+	max-width: 100%;
 	width: auto;
+	height: auto;
+	object-fit: contain;
 	display: block;
 	transition: transform 0.2s ease;
 }
@@ -103,6 +117,9 @@
 	font-weight: 700;
 	letter-spacing: -0.5px;
 	color: var(--navora-primary);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 /* Navigation List Base (Desktop) */
@@ -249,6 +266,15 @@
 	box-shadow: 0 6px 16px rgba(13, 148, 136, 0.25);
 }
 
+/* CTA Container */
+.navora-cta-container {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	flex-shrink: 0;
+	margin-left: auto;
+}
+
 /* Burger Toggle Button */
 .navora-burger-btn {
 	background: transparent;
@@ -256,19 +282,29 @@
 	display: none;
 	flex-direction: column;
 	justify-content: space-between;
-	width: 24px;
-	height: 18px;
+	align-items: center;
+	width: 38px;
+	height: 38px;
+	padding: 9px 7px;
 	cursor: pointer;
-	padding: 0;
 	z-index: 10001;
+	flex-shrink: 0;
+	border-radius: 8px;
+	transition: background-color 0.2s ease;
+}
+
+.navora-burger-btn:hover,
+.navora-burger-btn:focus {
+	background-color: rgba(0, 0, 0, 0.05);
 }
 
 .burger-line {
-	width: 100%;
-	height: 2px;
-	background-color: var(--navora-text);
+	width: 22px;
+	height: 2.5px;
+	background-color: var(--navora-text, #1f2937);
 	border-radius: 2px;
 	transition: all 0.2s ease;
+	display: block;
 }
 
 /* Drawer overlay */
@@ -349,13 +385,30 @@ body.navora-drawer-open .navora-mobile-drawer.behavior-fade {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	margin-bottom: 30px;
+	margin-bottom: 24px;
 	padding-bottom: 15px;
 	border-bottom: 1px solid #f1f5f9;
+	gap: 12px;
+}
+
+.navora-drawer-logo {
+	min-width: 0;
+	max-width: calc(100% - 40px);
 }
 
 .navora-drawer-logo a {
+	display: flex;
+	align-items: center;
 	text-decoration: none;
+	max-width: 100%;
+}
+
+.navora-drawer-logo .navora-logo-img {
+	max-height: 38px;
+	max-width: 100%;
+	width: auto;
+	height: auto;
+	object-fit: contain;
 }
 
 .navora-close-btn {
@@ -366,6 +419,7 @@ body.navora-drawer-open .navora-mobile-drawer.behavior-fade {
 	cursor: pointer;
 	padding: 0;
 	line-height: 1;
+	flex-shrink: 0;
 }
 
 .navora-close-btn:hover {
@@ -668,5 +722,21 @@ body.navora-drawer-open .navora-mobile-drawer.behavior-fade {
 
 .navora-header-nav.layout-modern-wellness .navora-topbar-inner {
 	padding: 0 10px;
+}
+
+/* Default Mobile Responsive Fallback (Dynamic breakpoint rules are injected via inline style) */
+@media (max-width: 768px) {
+	.navora-desktop-menu {
+		display: none;
+	}
+	.navora-burger-btn {
+		display: flex;
+	}
+	.navora-header-nav .navora-cta-container .navora-cta-btn {
+		display: none;
+	}
+	.navora-topbar.hide-on-mobile {
+		display: none;
+	}
 }
 

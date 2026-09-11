@@ -3,7 +3,7 @@
  * Plugin Name: Navora
  * Plugin URI:  https://www.hipnolink.com
  * Description: Modern Navigation, Made Simple. Modern and clean healthcare navigation menus designed for WordPress and Elementor Free.
- * Version:     1.1.0
+ * Version:     1.1.1
  * Author:      Hipnolink Digital Team
  * Author URI:  https://www.hipnolink.com
  * License:     GPL2
@@ -72,7 +72,7 @@ if ( ! navora_check_system_requirements() ) {
 }
 
 // Define Constants.
-define( 'NAVORA_VERSION', '1.1.0' );
+define( 'NAVORA_VERSION', '1.1.1' );
 define( 'NAVORA_PATH', plugin_dir_path( __FILE__ ) );
 define( 'NAVORA_URL', plugin_dir_url( __FILE__ ) );
 
@@ -132,8 +132,10 @@ class Navora {
 		// Initialize Elementor integration.
 		Navora_Elementor::get_instance();
 
-		// Initialize GitHub Updater.
-		new Navora_Updater( NAVORA_PATH . 'navora.php', 'hipnolink', 'navora' );
+		// Initialize GitHub Updater (Admin and Cron only to keep frontend lightweight).
+		if ( is_admin() || ( defined( 'DOING_CRON' ) && DOING_CRON ) ) {
+			new Navora_Updater( NAVORA_PATH . 'navora.php', 'hipnolink', 'navora' );
+		}
 	}
 }
 

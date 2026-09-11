@@ -23,42 +23,52 @@ document.addEventListener('DOMContentLoaded', function() {
 	}
 
 	// Mobile Drawer Triggers
-	if (burgerBtn && closeBtn && overlay) {
-		// Open drawer
-		burgerBtn.addEventListener('click', function() {
+	var closeDrawer = function() {
+		body.classList.remove('navora-drawer-open');
+		var openBurgers = document.querySelectorAll('.navora-burger-btn');
+		openBurgers.forEach(function(btn) {
+			btn.setAttribute('aria-expanded', 'false');
+		});
+	};
+
+	document.addEventListener('click', function(e) {
+		var burger = e.target.closest('.navora-burger-btn');
+		if (burger) {
+			e.preventDefault();
 			body.classList.add('navora-drawer-open');
-			burgerBtn.setAttribute('aria-expanded', 'true');
-		});
+			burger.setAttribute('aria-expanded', 'true');
+			return;
+		}
 
-		// Close drawer functions
-		var closeDrawer = function() {
-			body.classList.remove('navora-drawer-open');
-			burgerBtn.setAttribute('aria-expanded', 'false');
-		};
+		var close = e.target.closest('.navora-close-btn') || e.target.closest('.navora-drawer-overlay');
+		if (close) {
+			e.preventDefault();
+			closeDrawer();
+			return;
+		}
+	});
 
-		closeBtn.addEventListener('click', closeDrawer);
-		overlay.addEventListener('click', closeDrawer);
-
-		// Close menu on pressing Escape key (A11y)
-		document.addEventListener('keydown', function(e) {
-			if (e.key === 'Escape' && body.classList.contains('navora-drawer-open')) {
-				closeDrawer();
-			}
-		});
-	}
+	// Close menu on pressing Escape key (A11y)
+	document.addEventListener('keydown', function(e) {
+		if (e.key === 'Escape' && body.classList.contains('navora-drawer-open')) {
+			closeDrawer();
+		}
+	});
 
 	// Inject and handle mobile sub-menu dropdown toggle arrows
-	if (mobileMenu) {
-		var parentItems = mobileMenu.querySelectorAll('.menu-item-has-children');
+	var mobileMenus = document.querySelectorAll('.navora-mobile-menu');
+	mobileMenus.forEach(function(menu) {
+		var parentItems = menu.querySelectorAll('.menu-item-has-children');
 		
 		parentItems.forEach(function(item) {
 			// Find primary link inside parent item
 			var link = item.querySelector('a');
-			if (!link) return;
+			if (!link || item.querySelector('.navora-submenu-toggle')) return;
 
 			// Create toggle button
 			var toggleBtn = document.createElement('button');
 			toggleBtn.className = 'navora-submenu-toggle';
+			toggleBtn.setAttribute('type', 'button');
 			toggleBtn.setAttribute('aria-label', 'Toggle submenu');
 			toggleBtn.setAttribute('aria-expanded', 'false');
 
@@ -88,5 +98,5 @@ document.addEventListener('DOMContentLoaded', function() {
 				}
 			});
 		});
-	}
+	});
 });
