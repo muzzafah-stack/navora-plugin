@@ -1,102 +1,104 @@
 /**
- * Navora Public Scripts - Vanilla JS for maximum compatibility and lightweight footprint.
+ * Navora Public Navigation Scripts
+ * Performance & Cache-First Architecture (Perfmatters, FlyingPress, Cloudflare, WP Rocket compatible).
  */
-document.addEventListener('DOMContentLoaded', function() {
-	var body = document.body;
-	var header = document.querySelector('.navora-header-nav');
-	var burgerBtn = document.querySelector('.navora-burger-btn');
-	var closeBtn = document.querySelector('.navora-close-btn');
-	var overlay = document.querySelector('.navora-drawer-overlay');
-	var mobileMenu = document.querySelector('.navora-mobile-menu');
+(function() {
+	'use strict';
 
-	// Sticky Header dynamic class helper
-	if (header && header.classList.contains('navora-sticky')) {
-		var handleScroll = function() {
-			if (window.scrollY > 80) {
-				header.classList.add('navora-scrolled');
-			} else {
-				header.classList.remove('navora-scrolled');
-			}
-		};
-		window.addEventListener('scroll', handleScroll);
-		handleScroll(); // Run immediately on load.
+	// Helper to close drawer
+	function closeDrawer() {
+		document.body.classList.remove('navora-drawer-open');
+		var burgers = document.querySelectorAll('.navora-burger-btn');
+		for (var i = 0; i < burgers.length; i++) {
+			burgers[i].setAttribute('aria-expanded', 'false');
+		}
 	}
 
-	// Mobile Drawer Triggers
-	var closeDrawer = function() {
-		body.classList.remove('navora-drawer-open');
-		var openBurgers = document.querySelectorAll('.navora-burger-btn');
-		openBurgers.forEach(function(btn) {
-			btn.setAttribute('aria-expanded', 'false');
-		});
-	};
+	// Scroll handler for sticky header elevation styling
+	function updateStickyState() {
+		var headers = document.querySelectorAll('.navora-header-nav.navora-sticky');
+		if (!headers.length) return;
 
+		var isScrolled = (window.pageYOffset || document.documentElement.scrollTop) > 40;
+		for (var i = 0; i < headers.length; i++) {
+			if (isScrolled) {
+				headers[i].classList.add('navora-scrolled');
+			} else {
+				headers[i].classList.remove('navora-scrolled');
+			}
+		}
+	}
+
+	// Global delegated click handler (Resilient across delay-js and cached HTML)
 	document.addEventListener('click', function(e) {
+		// 1. Burger Toggle
 		var burger = e.target.closest('.navora-burger-btn');
 		if (burger) {
 			e.preventDefault();
-			body.classList.add('navora-drawer-open');
-			burger.setAttribute('aria-expanded', 'true');
+			var isOpen = document.body.classList.toggle('navora-drawer-open');
+			burger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
 			return;
 		}
 
-		var close = e.target.closest('.navora-close-btn') || e.target.closest('.navora-drawer-overlay');
+		// 2. Close Drawer Buttons & Overlay
+		var close = e.target.closest('.navora-close-btn, .navora-drawer-overlay');
 		if (close) {
 			e.preventDefault();
 			closeDrawer();
 			return;
 		}
-	});
 
-	// Close menu on pressing Escape key (A11y)
-	document.addEventListener('keydown', function(e) {
-		if (e.key === 'Escape' && body.classList.contains('navora-drawer-open')) {
+		// 3. Mobile Submenu Toggle Arrow
+		var toggleBtn = e.target.closest('.navora-submenu-toggle');
+		if (toggleBtn) {
+			e.preventDefault();
+			e.stopPropagation();
+
+			var parentItem = toggleBtn.closest('.menu-item');
+			if (!parentItem) return;
+
+			var subMenu = parentItem.querySelector('.sub-menu');
+			var isToggled = toggleBtn.classList.toggle('toggled');
+			parentItem.classList.toggle('is-open', isToggled);
+			toggleBtn.setAttribute('aria-expanded', isToggled ? 'true' : 'false');
+
+			if (subMenu) {
+				subMenu.classList.toggle('is-open', isToggled);
+				subMenu.style.display = isToggled ? 'block' : 'none';
+			}
+			return;
+		}
+
+		// 4. In-page anchor click inside drawer should close drawer
+		var drawerLink = e.target.closest('.navora-mobile-drawer a[href^="#"]');
+		if (drawerLink && drawerLink.getAttribute('href') !== '#') {
 			closeDrawer();
 		}
 	});
 
-	// Inject and handle mobile sub-menu dropdown toggle arrows
-	var mobileMenus = document.querySelectorAll('.navora-mobile-menu');
-	mobileMenus.forEach(function(menu) {
-		var parentItems = menu.querySelectorAll('.menu-item-has-children');
-		
-		parentItems.forEach(function(item) {
-			// Find primary link inside parent item
-			var link = item.querySelector('a');
-			if (!link || item.querySelector('.navora-submenu-toggle')) return;
-
-			// Create toggle button
-			var toggleBtn = document.createElement('button');
-			toggleBtn.className = 'navora-submenu-toggle';
-			toggleBtn.setAttribute('type', 'button');
-			toggleBtn.setAttribute('aria-label', 'Toggle submenu');
-			toggleBtn.setAttribute('aria-expanded', 'false');
-
-			// Append toggle button inside list item
-			item.insertBefore(toggleBtn, link.nextSibling);
-
-			// Handle toggle click
-			toggleBtn.addEventListener('click', function(e) {
-				e.preventDefault();
-				e.stopPropagation();
-
-				var subMenu = item.querySelector('.sub-menu');
-				if (!subMenu) return;
-
-				var isToggled = toggleBtn.classList.contains('toggled');
-
-				if (isToggled) {
-					// Hide submenu
-					subMenu.style.display = 'none';
-					toggleBtn.classList.remove('toggled');
-					toggleBtn.setAttribute('aria-expanded', 'false');
-				} else {
-					// Show submenu
-					subMenu.style.display = 'block';
-					toggleBtn.classList.add('toggled');
-					toggleBtn.setAttribute('aria-expanded', 'true');
-				}
-			});
-		});
+	// A11y: Close on Escape key
+	document.addEventListener('keydown', function(e) {
+		if (e.key === 'Escape' && document.body.classList.contains('navora-drawer-open')) {
+			closeDrawer();
+		}
 	});
-});
+
+	// Attach passive scroll listener
+	window.addEventListener('scroll', updateStickyState, { passive: true });
+
+	// Initialize immediately and on DOM load/ready
+	function initNavora() {
+		updateStickyState();
+	}
+
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', initNavora);
+	} else {
+		initNavora();
+	}
+
+	// Elementor frontend hook support (for editor preview mode)
+	if (window.elementorFrontend && window.elementorFrontend.hooks) {
+		window.elementorFrontend.hooks.addAction('frontend/element_ready/global', initNavora);
+	}
+})();

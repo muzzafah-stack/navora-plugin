@@ -33,6 +33,8 @@ class Navora_Settings {
 		add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
 		// Register settings.
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
+		// Purge cache plugins when settings are saved.
+		add_action( 'update_option_navora_options', array( $this, 'purge_all_caches' ), 10, 0 );
 		// Enqueue scripts on settings page.
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_assets' ) );
 	}
@@ -452,6 +454,85 @@ class Navora_Settings {
 			</div>
 		</div>
 		<?php
+	}
+
+	/**
+	 * Purge all known cache plugins when Navora settings are updated.
+	 */
+	public function purge_all_caches() {
+		// 1. Perfmatters
+		if ( class_exists( '\Perfmatters\CSS' ) && method_exists( '\Perfmatters\CSS', 'clear_used_css' ) ) {
+			\Perfmatters\CSS::clear_used_css();
+		}
+		if ( has_action( 'perfmatters_clear_cache' ) ) {
+			do_action( 'perfmatters_clear_cache' );
+		}
+
+		// 2. FlyingPress
+		if ( class_exists( '\FlyingPress\Purge' ) && method_exists( '\FlyingPress\Purge', 'purge_everything' ) ) {
+			\FlyingPress\Purge::purge_everything();
+		}
+
+		// 3. Cloudflare Plugin
+		if ( has_action( 'cloudflare_purge_everything' ) ) {
+			do_action( 'cloudflare_purge_everything' );
+		}
+
+		// 4. WP Rocket
+		if ( function_exists( 'rocket_clean_domain' ) ) {
+			rocket_clean_domain();
+		}
+		if ( function_exists( 'rocket_clean_minify' ) ) {
+			rocket_clean_minify();
+		}
+
+		// 5. LiteSpeed Cache
+		if ( class_exists( '\LiteSpeed_Cache_API' ) && method_exists( '\LiteSpeed_Cache_API', 'purge_all' ) ) {
+			\LiteSpeed_Cache_API::purge_all();
+		} elseif ( has_action( 'litespeed_purge_all' ) ) {
+			do_action( 'litespeed_purge_all' );
+		}
+
+		// 6. Autoptimize
+		if ( class_exists( '\autoptimizeCache' ) && method_exists( '\autoptimizeCache', 'clearall' ) ) {
+			\autoptimizeCache::clearall();
+		}
+
+		// 7. WP Super Cache
+		if ( function_exists( 'wp_cache_clear_cache' ) ) {
+			wp_cache_clear_cache();
+		}
+
+		// 8. W3 Total Cache
+		if ( function_exists( 'w3tc_flush_all' ) ) {
+			w3tc_flush_all();
+		}
+
+		// 9. SiteGround Optimizer
+		if ( function_exists( 'sg_cachepress_purge_cache' ) ) {
+			sg_cachepress_purge_cache();
+		}
+
+		// 10. WP Engine
+		if ( class_exists( '\WpeCommon' ) ) {
+			if ( method_exists( '\WpeCommon', 'purge_memcached' ) ) {
+				\WpeCommon::purge_memcached();
+			}
+			if ( method_exists( '\WpeCommon', 'clear_maxcdn_cache' ) ) {
+				\WpeCommon::clear_maxcdn_cache();
+			}
+			if ( method_exists( '\WpeCommon', 'purge_varnish_cache' ) ) {
+				\WpeCommon::purge_varnish_cache();
+			}
+		}
+
+		// 11. Kinsta Cache
+		if ( class_exists( '\Kinsta\Cache' ) ) {
+			global $kinsta_cache;
+			if ( isset( $kinsta_cache->kinsta_cache_purge ) && method_exists( $kinsta_cache->kinsta_cache_purge, 'purge_complete_caches' ) ) {
+				$kinsta_cache->kinsta_cache_purge->purge_complete_caches();
+			}
+		}
 	}
 }
 

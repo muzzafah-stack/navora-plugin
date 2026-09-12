@@ -37,6 +37,9 @@ class Navora_Renderer {
 
 		// Preconnect resource hints for Google Fonts.
 		add_filter( 'wp_resource_hints', array( $this, 'add_resource_hints' ), 10, 2 );
+
+		// Script loader tag compatibility for Cloudflare Rocket Loader & Cache plugins.
+		add_filter( 'script_loader_tag', array( $this, 'filter_script_loader_tag' ), 10, 3 );
 	}
 
 	/**
@@ -45,11 +48,27 @@ class Navora_Renderer {
 	public function add_resource_hints( $urls, $relation_type ) {
 		if ( wp_style_is( 'navora-google-fonts', 'queue' ) && 'preconnect' === $relation_type ) {
 			$urls[] = array(
+				'href'        => 'https://fonts.googleapis.com',
+				'crossorigin' => 'anonymous',
+			);
+			$urls[] = array(
 				'href'        => 'https://fonts.gstatic.com',
 				'crossorigin' => 'anonymous',
 			);
 		}
 		return $urls;
+	}
+
+	/**
+	 * Ensure script compatibility with Cloudflare Rocket Loader and cache plugins.
+	 */
+	public function filter_script_loader_tag( $tag, $handle, $src ) {
+		if ( 'navora-public-script' === $handle ) {
+			if ( false === strpos( $tag, 'data-cfasync' ) ) {
+				$tag = str_replace( '<script ', '<script data-cfasync="false" ', $tag );
+			}
+		}
+		return $tag;
 	}
 
 	/**
@@ -96,14 +115,14 @@ class Navora_Renderer {
 		$options    = Navora_Settings::get_options();
 		$breakpoint = (int) $options['breakpoint'];
 
-		// Map typography.
+		// Map typography with robust fallback font stacks to avoid FOUT/CLS.
 		$font_stack = 'inherit';
 		if ( 'Outfit' === $options['font_family'] ) {
-			$font_stack = '"Outfit", sans-serif';
+			$font_stack = '"Outfit", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 		} elseif ( 'Inter' === $options['font_family'] ) {
-			$font_stack = '"Inter", sans-serif';
+			$font_stack = '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 		} elseif ( 'Roboto' === $options['font_family'] ) {
-			$font_stack = '"Roboto", sans-serif';
+			$font_stack = '"Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif';
 		} elseif ( 'sans-serif' === $options['font_family'] ) {
 			$font_stack = 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 		}
@@ -337,7 +356,11 @@ class Navora_Renderer {
 				<?php endif; ?>
 
 				<nav class="navora-mobile-menu" aria-label="<?php esc_attr_e( 'Mobile Navigation', 'navora' ); ?>">
-					<?php wp_nav_menu( $menu_args ); ?>
+					<?php
+					$mobile_menu_args = $menu_args;
+					$mobile_menu_args['walker'] = new Navora_Mobile_Nav_Walker();
+					wp_nav_menu( $mobile_menu_args );
+					?>
 				</nav>
 
 				<div class="navora-drawer-footer">
@@ -367,6 +390,24 @@ class Navora_Renderer {
 		echo '<ul class="navora-menu-list fallback-menu">';
 		echo '<li class="menu-item"><a href="' . esc_url( admin_url( 'nav-menus.php' ) ) . '">' . esc_html__( 'Create / Select a Menu in WordPress', 'navora' ) . '</a></li>';
 		echo '</ul>';
+	}
+}
+
+/**
+ * Custom Mobile Nav Walker for server-side dropdown toggles.
+ * Eliminates DOM injection via JS and prevents CLS (Cumulative Layout Shift) when scripts are delayed by cache plugins.
+ */
+class Navora_Mobile_Nav_Walker extends Walker_Nav_Menu {
+	public function start_el( &$output, $data_object, $depth = 0, $args = null, $current_object_id = 0 ) {
+		$item_output = '';
+		parent::start_el( $item_output, $data_object, $depth, $args, $current_object_id );
+
+		if ( ! empty( $data_object->classes ) && in_array( 'menu-item-has-children', (array) $data_object->classes, true ) ) {
+			$toggle_btn = '<button class="navora-submenu-toggle" type="button" aria-label="' . esc_attr__( 'Toggle submenu', 'navora' ) . '" aria-expanded="false"></button>';
+			$item_output = preg_replace( '/(<\/a>)/i', '$1' . $toggle_btn, $item_output, 1 );
+		}
+
+		$output .= $item_output;
 	}
 }
 

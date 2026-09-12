@@ -2,6 +2,19 @@
  * Navora Frontend Navigation Styles (Standard 2026 Health Visual System)
  */
 
+/* Default CSS Variables Fallback (Ensures zero FOUC if inline style is delayed/cached) */
+:root {
+	--navora-primary: #0d9488;
+	--navora-text: #1f2937;
+	--navora-active: #0f766e;
+	--navora-bg: #ffffff;
+	--navora-font: "Outfit", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	--navora-breakpoint-val: 768px;
+	--navora-topbar-bg: #f0fdfa;
+	--navora-topbar-text: #334155;
+	--navora-topbar-link: #0d9488;
+}
+
 /* Core Container & Reset */
 .navora-header-nav {
 	font-family: var(--navora-font);
@@ -10,7 +23,7 @@
 	width: 100%;
 	position: relative;
 	z-index: 9999;
-	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+	transition: background-color 0.25s ease, box-shadow 0.25s ease, padding 0.25s ease;
 }
 
 .navora-header-nav * {
@@ -30,22 +43,17 @@
 	width: 100%;
 }
 
-/* Sticky Header Behavior */
+/* Sticky Header Behavior (Native sticky prevents content jump / CLS) */
 .navora-header-nav.navora-sticky {
-	position: fixed;
+	position: sticky;
 	top: 0;
 	left: 0;
-	box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
-	animation: navora-slide-down 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+	z-index: 9999;
 }
 
-@keyframes navora-slide-down {
-	from {
-		transform: translateY(-100%);
-	}
-	to {
-		transform: translateY(0);
-	}
+.navora-header-nav.navora-sticky.navora-scrolled {
+	box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.08);
+	background-color: var(--navora-bg);
 }
 
 /* Layout 1: Clean Clinical */
@@ -76,7 +84,7 @@
 	padding-top: 10px;
 }
 
-.navora-header-nav.layout-modern-wellness.navora-sticky .navora-nav-container {
+.navora-header-nav.layout-modern-wellness.navora-sticky.navora-scrolled .navora-nav-container {
 	background: rgba(255, 255, 255, 0.95);
 	box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.08);
 }
@@ -461,6 +469,11 @@ body.navora-drawer-open .navora-mobile-drawer.behavior-fade {
 	display: none !important;
 }
 
+/* Desktop sub-menu toggle safety hide */
+.navora-desktop-menu .navora-submenu-toggle {
+	display: none !important;
+}
+
 /* Mobile Dropdown Submenus */
 .navora-mobile-menu .sub-menu {
 	list-style: none;
@@ -470,6 +483,11 @@ body.navora-drawer-open .navora-mobile-drawer.behavior-fade {
 	background: #f8fafc;
 	border-radius: 8px;
 	width: 100%;
+}
+
+.navora-mobile-menu .menu-item.is-open > .sub-menu,
+.navora-mobile-menu .sub-menu.is-open {
+	display: block;
 }
 
 .navora-mobile-menu .sub-menu .menu-item {
@@ -509,6 +527,7 @@ body.navora-drawer-open .navora-mobile-drawer.behavior-fade {
 	transition: transform 0.2s ease;
 }
 
+.navora-mobile-menu .menu-item.is-open > .navora-submenu-toggle::after,
 .navora-submenu-toggle.toggled::after {
 	transform: rotate(-135deg);
 	color: var(--navora-primary);
