@@ -221,7 +221,7 @@ class Navora_Settings {
 									<input type="radio" name="navora_options[layout]" value="clean-clinical" <?php checked( $options['layout'], 'clean-clinical' ); ?>>
 									<span class="radio-label">
 										<strong><?php esc_html_e( 'Clean Clinical', 'navora' ); ?></strong>
-										<span class="desc"><?php esc_html_e( 'Centered logo, clean borders, professional grid.', 'navora' ); ?></span>
+										<span class="desc"><?php esc_html_e( 'Classic layout, seamless hero blend, professional grid.', 'navora' ); ?></span>
 									</span>
 								</label>
 								<label class="navora-radio-card">
