@@ -50,7 +50,7 @@ class Navora_Elementor_Widget extends \Elementor\Widget_Base {
 	 *
 	 * @return bool
 	 */
-	public function has_widget_inner_wrapper() {
+	public function has_widget_inner_wrapper(): bool {
 		return false;
 	}
 

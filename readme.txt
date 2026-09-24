@@ -4,7 +4,7 @@ Tags: menu, navigation, health, medical, elementor, mobile-menu, responsive
 Requires at least: 7.0
 Tested up to: 7.1.2
 Requires PHP: 8.2
-Stable tag: 1.1.4
+Stable tag: 1.1.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -35,3 +35,11 @@ No, Navora works perfectly with Elementor Free.
 
 = Does it conflict with caching plugins? =
 No. Navora uses inline CSS custom properties (CSS variables) for user settings, so the main CSS file is static and fully cacheable by CDNs, Cloudflare, FlyingPress, and Perfmatters.
+
+== Changelog ==
+
+= 1.1.5 =
+* Fix: Add `: bool` return type to `has_widget_inner_wrapper()` for Elementor 3.x+ and PHP 8+ compatibility.
+
+= 1.1.4 =
+* Performance improvements and asset optimizations.
