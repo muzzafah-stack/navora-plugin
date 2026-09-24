@@ -42,11 +42,20 @@ class Navora_Elementor_Widget extends \Elementor\Widget_Base {
 	 * Get widget keywords.
 	 */
 	public function get_keywords() {
-		return array( 'navora', 'menu', 'navigation', 'health', 'medical' );
+		return array( 'navora', 'menu', 'navigation', 'health', 'medical', 'header', 'navbar' );
 	}
 
 	/**
-	 * Register widget controls (if any are needed in the future).
+	 * Check if widget has inner wrapper (Elementor 3.x/4.x DOM optimization compatibility).
+	 *
+	 * @return bool
+	 */
+	public function has_widget_inner_wrapper() {
+		return false;
+	}
+
+	/**
+	 * Register widget controls.
 	 */
 	protected function register_controls() {
 		$this->start_controls_section(
@@ -63,7 +72,7 @@ class Navora_Elementor_Widget extends \Elementor\Widget_Base {
 				'type' => \Elementor\Controls_Manager::RAW_HTML,
 				'raw'  => sprintf(
 					/* translators: %s: url to settings page */
-					__( 'Configure menu sources, layout options, colors, and branding details in the <a href="%s" target="_blank">Navora Settings Panel</a>.', 'navora' ),
+					__( 'Configure menu sources, layout options, colors, and branding details in the <a href="%s" target="_blank" style="color: #0d9488; font-weight: 600; text-decoration: underline;">Navora Settings Panel</a>.', 'navora' ),
 					esc_url( admin_url( 'options-general.php?page=navora' ) )
 				),
 			)

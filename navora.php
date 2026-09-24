@@ -1,15 +1,18 @@
 <?php
 /**
  * Plugin Name: Navora
- * Plugin URI:  https://www.hipnolink.com
+ * Plugin URI:  https://github.com/muzzafah-stack
  * Description: Modern Navigation, Made Simple. Modern and clean healthcare navigation menus designed for WordPress and Elementor Free.
- * Version:     1.1.3
+ * Version:     1.1.4
  * Author:      Hipnolink Digital Team
  * Author URI:  https://www.hipnolink.com
  * License:     GPL2
  * Text Domain: navora
  * Requires PHP: 8.2
  * Requires at least: 7.0
+ * Tested up to: 7.1.2
+ * Elementor tested up to: 4.3.1
+ * Elementor Pro tested up to: 4.3.1
  */
 
 // Prevent direct access.
@@ -72,7 +75,7 @@ if ( ! navora_check_system_requirements() ) {
 }
 
 // Define Constants.
-define( 'NAVORA_VERSION', '1.1.3' );
+define( 'NAVORA_VERSION', '1.1.4' );
 define( 'NAVORA_PATH', plugin_dir_path( __FILE__ ) );
 define( 'NAVORA_URL', plugin_dir_url( __FILE__ ) );
 

@@ -97,8 +97,17 @@
 		initNavora();
 	}
 
-	// Elementor frontend hook support (for editor preview mode)
-	if (window.elementorFrontend && window.elementorFrontend.hooks) {
-		window.elementorFrontend.hooks.addAction('frontend/element_ready/global', initNavora);
+	// Elementor frontend hook support (for editor live preview mode)
+	function bindElementorFrontend() {
+		if (window.elementorFrontend && window.elementorFrontend.hooks) {
+			window.elementorFrontend.hooks.addAction('frontend/element_ready/global', initNavora);
+			window.elementorFrontend.hooks.addAction('frontend/element_ready/navora_menu.default', initNavora);
+		}
+	}
+
+	bindElementorFrontend();
+	window.addEventListener('elementor/frontend/init', bindElementorFrontend);
+	if (window.jQuery) {
+		window.jQuery(window).on('elementor/frontend/init', bindElementorFrontend);
 	}
 })();

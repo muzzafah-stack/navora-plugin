@@ -29,24 +29,32 @@ class Navora_Elementor {
 	 * Constructor.
 	 */
 	private function __construct() {
-		add_action( 'init', array( $this, 'check_elementor_active' ) );
-	}
-
-	/**
-	 * Check if Elementor is active, then hook widget registration.
-	 */
-	public function check_elementor_active() {
 		if ( did_action( 'elementor/loaded' ) ) {
-			add_action( 'elementor/widgets/register', array( $this, 'register_navora_widget' ) );
+			$this->init();
+		} else {
+			add_action( 'elementor/loaded', array( $this, 'init' ) );
 		}
 	}
 
 	/**
+	 * Hook widget registration.
+	 */
+	public function init() {
+		add_action( 'elementor/widgets/register', array( $this, 'register_navora_widget' ) );
+	}
+
+	/**
 	 * Register the widget with Elementor.
+	 *
+	 * @param \Elementor\Widgets_Manager $widgets_manager Elementor widgets manager instance.
 	 */
 	public function register_navora_widget( $widgets_manager ) {
 		// Include Widget Class code dynamically.
 		require_once NAVORA_PATH . 'includes/class-navora-elementor-widget.php';
-		$widgets_manager->register( new Navora_Elementor_Widget() );
+		if ( is_object( $widgets_manager ) && method_exists( $widgets_manager, 'register' ) ) {
+			$widgets_manager->register( new Navora_Elementor_Widget() );
+		} elseif ( is_object( $widgets_manager ) && method_exists( $widgets_manager, 'register_widget_type' ) ) {
+			$widgets_manager->register_widget_type( new Navora_Elementor_Widget() );
+		}
 	}
 }

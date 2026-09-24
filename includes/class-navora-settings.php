@@ -74,6 +74,9 @@ class Navora_Settings {
 			'menu_id'              => '',
 			'layout'               => 'clean-clinical',
 			'logo_url'             => '',
+			'logo_id'              => '',
+			'logo_width'           => '',
+			'logo_height'          => '',
 			'primary_color'        => '#0d9488', // Teal
 			'text_color'           => '#1f2937', // Dark Slate
 			'active_color'         => '#0f766e', // Hover Teal
@@ -112,6 +115,81 @@ class Navora_Settings {
 	}
 
 	/**
+	 * Helper to get image dimensions (width & height in pixels) for CLS prevention.
+	 *
+	 * @param string $url Image URL.
+	 * @param int    $id  Attachment ID (optional).
+	 * @return array Array with 'width' and 'height'.
+	 */
+	public static function get_image_dimensions( $url, $id = 0 ) {
+		$dimensions = array(
+			'width'  => 0,
+			'height' => 0,
+		);
+
+		if ( empty( $url ) ) {
+			return $dimensions;
+		}
+
+		// 1. Try by Attachment ID if provided or discovered.
+		$attachment_id = absint( $id );
+		if ( ! $attachment_id && function_exists( 'attachment_url_to_postid' ) ) {
+			$attachment_id = attachment_url_to_postid( $url );
+		}
+
+		if ( $attachment_id ) {
+			$meta = wp_get_attachment_metadata( $attachment_id );
+			if ( ! empty( $meta['width'] ) && ! empty( $meta['height'] ) ) {
+				$dimensions['width']  = (int) $meta['width'];
+				$dimensions['height'] = (int) $meta['height'];
+				return $dimensions;
+			}
+
+			$img_src = wp_get_attachment_image_src( $attachment_id, 'full' );
+			if ( ! empty( $img_src ) && is_array( $img_src ) && ! empty( $img_src[1] ) && ! empty( $img_src[2] ) ) {
+				$dimensions['width']  = (int) $img_src[1];
+				$dimensions['height'] = (int) $img_src[2];
+				return $dimensions;
+			}
+		}
+
+		// 2. Try by local uploads path.
+		$upload_dir = wp_upload_dir();
+		if ( ! empty( $upload_dir['baseurl'] ) && strpos( $url, $upload_dir['baseurl'] ) === 0 ) {
+			$file_path = str_replace( $upload_dir['baseurl'], $upload_dir['basedir'], $url );
+			if ( file_exists( $file_path ) ) {
+				// Check for SVG file.
+				$ext = strtolower( pathinfo( wp_parse_url( $url, PHP_URL_PATH ), PATHINFO_EXTENSION ) );
+				if ( 'svg' === $ext && is_readable( $file_path ) ) {
+					$svg_content = @file_get_contents( $file_path );
+					if ( $svg_content ) {
+						if ( preg_match( '/<svg[^>]+viewBox=["\']\s*([0-9.]+)\s+([0-9.]+)\s+([0-9.]+)\s+([0-9.]+)\s*["\']/i', $svg_content, $matches ) ) {
+							$dimensions['width']  = (int) round( (float) $matches[3] );
+							$dimensions['height'] = (int) round( (float) $matches[4] );
+							return $dimensions;
+						} elseif ( preg_match( '/<svg[^>]+width=["\']([0-9.]+)["\'][^>]+height=["\']([0-9.]+)["\']/i', $svg_content, $matches ) ) {
+							$dimensions['width']  = (int) round( (float) $matches[1] );
+							$dimensions['height'] = (int) round( (float) $matches[2] );
+							return $dimensions;
+						}
+					}
+				}
+
+				if ( function_exists( 'getimagesize' ) ) {
+					$size = @getimagesize( $file_path );
+					if ( ! empty( $size ) && is_array( $size ) && ! empty( $size[0] ) && ! empty( $size[1] ) ) {
+						$dimensions['width']  = (int) $size[0];
+						$dimensions['height'] = (int) $size[1];
+						return $dimensions;
+					}
+				}
+			}
+		}
+
+		return $dimensions;
+	}
+
+	/**
 	 * Sanitize Settings Input.
 	 */
 	public function sanitize_options( $input ) {
@@ -120,6 +198,18 @@ class Navora_Settings {
 		$output['menu_id']         = isset( $input['menu_id'] ) ? sanitize_text_field( $input['menu_id'] ) : '';
 		$output['layout']          = isset( $input['layout'] ) && in_array( $input['layout'], array( 'clean-clinical', 'modern-wellness' ), true ) ? $input['layout'] : 'clean-clinical';
 		$output['logo_url']        = isset( $input['logo_url'] ) ? esc_url_raw( $input['logo_url'] ) : '';
+		$output['logo_id']         = isset( $input['logo_id'] ) ? absint( $input['logo_id'] ) : 0;
+		$output['logo_width']      = isset( $input['logo_width'] ) ? absint( $input['logo_width'] ) : 0;
+		$output['logo_height']     = isset( $input['logo_height'] ) ? absint( $input['logo_height'] ) : 0;
+
+		// Automatically compute logo dimensions if URL is provided without width/height.
+		if ( ! empty( $output['logo_url'] ) && ( empty( $output['logo_width'] ) || empty( $output['logo_height'] ) ) ) {
+			$dims = self::get_image_dimensions( $output['logo_url'], $output['logo_id'] );
+			if ( ! empty( $dims['width'] ) && ! empty( $dims['height'] ) ) {
+				$output['logo_width']  = $dims['width'];
+				$output['logo_height'] = $dims['height'];
+			}
+		}
 		$output['primary_color']   = isset( $input['primary_color'] ) ? sanitize_hex_color( $input['primary_color'] ) : '#0d9488';
 		$output['text_color']      = isset( $input['text_color'] ) ? sanitize_hex_color( $input['text_color'] ) : '#1f2937';
 		$output['active_color']    = isset( $input['active_color'] ) ? sanitize_hex_color( $input['active_color'] ) : '#0f766e';
@@ -239,10 +329,17 @@ class Navora_Settings {
 							<label for="navora_logo_url"><?php esc_html_e( 'Navigation Logo', 'navora' ); ?></label>
 							<div class="logo-upload-group">
 								<input type="text" id="navora_logo_url" name="navora_options[logo_url]" value="<?php echo esc_url( $options['logo_url'] ); ?>" class="regular-text">
+								<input type="hidden" id="navora_logo_id" name="navora_options[logo_id]" value="<?php echo esc_attr( ! empty( $options['logo_id'] ) ? $options['logo_id'] : '' ); ?>">
+								<input type="hidden" id="navora_logo_width" name="navora_options[logo_width]" value="<?php echo esc_attr( ! empty( $options['logo_width'] ) ? $options['logo_width'] : '' ); ?>">
+								<input type="hidden" id="navora_logo_height" name="navora_options[logo_height]" value="<?php echo esc_attr( ! empty( $options['logo_height'] ) ? $options['logo_height'] : '' ); ?>">
 								<button type="button" class="button navora-upload-button" id="navora_upload_logo_btn"><?php esc_html_e( 'Upload/Select', 'navora' ); ?></button>
 							</div>
+							<?php
+							$preview_w = ! empty( $options['logo_width'] ) ? ' width="' . esc_attr( $options['logo_width'] ) . '"' : '';
+							$preview_h = ! empty( $options['logo_height'] ) ? ' height="' . esc_attr( $options['logo_height'] ) . '"' : '';
+							?>
 							<div id="navora-logo-preview" class="logo-preview-wrapper" style="<?php echo empty( $options['logo_url'] ) ? 'display:none;' : ''; ?>">
-								<img src="<?php echo esc_url( $options['logo_url'] ); ?>" alt="Logo preview">
+								<img src="<?php echo esc_url( $options['logo_url'] ); ?>"<?php echo $preview_w . $preview_h; ?> alt="Logo preview">
 								<button type="button" class="navora-remove-logo" id="navora_remove_logo_btn">&times;</button>
 							</div>
 						</div>

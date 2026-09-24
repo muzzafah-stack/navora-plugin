@@ -261,7 +261,26 @@ class Navora_Renderer {
 		// Logo source.
 		$logo_html = '';
 		if ( ! empty( $options['logo_url'] ) ) {
-			$logo_html = '<img src="' . esc_url( $options['logo_url'] ) . '" alt="' . esc_attr( get_bloginfo( 'name' ) ) . '" class="navora-logo-img" decoding="async" loading="eager">';
+			$logo_url    = $options['logo_url'];
+			$logo_width  = ! empty( $options['logo_width'] ) ? absint( $options['logo_width'] ) : 0;
+			$logo_height = ! empty( $options['logo_height'] ) ? absint( $options['logo_height'] ) : 0;
+			$logo_id     = ! empty( $options['logo_id'] ) ? absint( $options['logo_id'] ) : 0;
+
+			// If dimensions are missing from stored options, dynamically retrieve them.
+			if ( empty( $logo_width ) || empty( $logo_height ) ) {
+				$dims = Navora_Settings::get_image_dimensions( $logo_url, $logo_id );
+				if ( ! empty( $dims['width'] ) && ! empty( $dims['height'] ) ) {
+					$logo_width  = $dims['width'];
+					$logo_height = $dims['height'];
+				}
+			}
+
+			$dim_attrs = '';
+			if ( $logo_width > 0 && $logo_height > 0 ) {
+				$dim_attrs = ' width="' . esc_attr( $logo_width ) . '" height="' . esc_attr( $logo_height ) . '"';
+			}
+
+			$logo_html = '<img src="' . esc_url( $logo_url ) . '"' . $dim_attrs . ' alt="' . esc_attr( get_bloginfo( 'name' ) ) . '" class="navora-logo-img" decoding="async" loading="eager">';
 		} else {
 			$logo_html = '<span class="navora-site-title">' . esc_html( get_bloginfo( 'name' ) ) . '</span>';
 		}
